@@ -50,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_vehicle_list);
 
 
-        initXmlViews();
+        initView();
 
         final LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
@@ -83,7 +83,7 @@ public class MainActivity extends AppCompatActivity {
     /***
      * This method is used initilize/bind view with activity
      */
-    private void initXmlViews()
+    private void initView()
     {
         mActionBar = getSupportActionBar();
         mRecyclerView =(RecyclerView)findViewById(R.id.recycler_view);
@@ -143,8 +143,6 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(MainActivity.this, "Error "+error.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
             }
         });
-
-
     }
 
 
