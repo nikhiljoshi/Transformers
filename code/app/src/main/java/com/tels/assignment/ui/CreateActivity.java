@@ -8,7 +8,6 @@ import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.text.InputFilter;
 import android.util.Log;
-import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -82,101 +81,88 @@ public class CreateActivity extends AppCompatActivity {
 
         }
 
-        btnCancel.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
+        btnCancel.setOnClickListener(v -> finish());
+
+        btnAuto.setOnClickListener(v -> {
+            Random random = new Random();
+
+            edtStrength.setText((random.nextInt(10) + 1) + "");
+            edtIntelligence.setText((random.nextInt(10) + 1) + "");
+            edtSpeed.setText((random.nextInt(10) + 1) + "");
+            edtEndurance.setText((random.nextInt(10) + 1) + "");
+            edtRank.setText((random.nextInt(10) + 1) + "");
+            edtCourage.setText((random.nextInt(10) + 1) + "");
+            edtFirepower.setText((random.nextInt(10) + 1) + "");
+            edtSkill.setText((random.nextInt(10) + 1) + "");
         });
 
-        btnAuto.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Random random = new Random();
+        btnCreateEdit.setOnClickListener(v -> {
+            TransformerRequest transformer = new TransformerRequest();
 
-                edtStrength.setText((random.nextInt(10) + 1) + "");
-                edtIntelligence.setText((random.nextInt(10) + 1) + "");
-                edtSpeed.setText((random.nextInt(10) + 1) + "");
-                edtEndurance.setText((random.nextInt(10) + 1) + "");
-                edtRank.setText((random.nextInt(10) + 1) + "");
-                edtCourage.setText((random.nextInt(10) + 1) + "");
-                edtFirepower.setText((random.nextInt(10) + 1) + "");
-                edtSkill.setText((random.nextInt(10) + 1) + "");
+            if (edtCourage.getText().toString().equals("") || edtEndurance.getText().toString().equals("") || edtFirepower.getText().toString().equals("")
+                    || edtIntelligence.getText().toString().equals("") || edtRank.getText().toString().equals("") || edtSkill.getText().toString().equals("")
+                    || edtSpeed.getText().toString().equals("") || edtStrength.getText().toString().equals("")) {
+                new AlertDialog.Builder(CreateActivity.this)
+                        .setMessage(R.string.msg_fail_create_invalid_data)
+                        .setNeutralButton(R.string.msg_btn_ok, new DialogInterface.OnClickListener(){
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {}
+                        }).show();
             }
-        });
+            else {
+                transformer.setName(edtName.getText().toString());
+                transformer.setStrength(Integer.parseInt(edtStrength.getText().toString()));
+                transformer.setIntelligence(Integer.parseInt(edtIntelligence.getText().toString()));
+                transformer.setSpeed(Integer.parseInt(edtSpeed.getText().toString()));
+                transformer.setEndurance(Integer.parseInt(edtEndurance.getText().toString()));
+                transformer.setCourage(Integer.parseInt(edtCourage.getText().toString()));
+                transformer.setRank(Integer.parseInt(edtRank.getText().toString()));
+                transformer.setFirepower(Integer.parseInt(edtFirepower.getText().toString()));
+                transformer.setSkill(Integer.parseInt(edtSkill.getText().toString()));
 
-        btnCreateEdit.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                TransformerRequest transformer = new TransformerRequest();
-
-                if (edtCourage.getText().toString().equals("") || edtEndurance.getText().toString().equals("") || edtFirepower.getText().toString().equals("")
-                        || edtIntelligence.getText().toString().equals("") || edtRank.getText().toString().equals("") || edtSkill.getText().toString().equals("")
-                        || edtSpeed.getText().toString().equals("") || edtStrength.getText().toString().equals("")) {
-                    new AlertDialog.Builder(CreateActivity.this)
-                            .setMessage(R.string.msg_fail_create_invalid_data)
-                            .setNeutralButton(R.string.msg_btn_ok, new DialogInterface.OnClickListener(){
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {}
-                            }).show();
-                }
-                else {
-                    transformer.setName(edtName.getText().toString());
-                    transformer.setStrength(Integer.parseInt(edtStrength.getText().toString()));
-                    transformer.setIntelligence(Integer.parseInt(edtIntelligence.getText().toString()));
-                    transformer.setSpeed(Integer.parseInt(edtSpeed.getText().toString()));
-                    transformer.setEndurance(Integer.parseInt(edtEndurance.getText().toString()));
-                    transformer.setCourage(Integer.parseInt(edtCourage.getText().toString()));
-                    transformer.setRank(Integer.parseInt(edtRank.getText().toString()));
-                    transformer.setFirepower(Integer.parseInt(edtFirepower.getText().toString()));
-                    transformer.setSkill(Integer.parseInt(edtSkill.getText().toString()));
-
-                    if (spnTeam.getSelectedItem().toString().equals(getResources().getString(R.string.txt_autobot)))
-                        transformer.setTeam("A");
-                    else if (spnTeam.getSelectedItem().toString().equals(getResources().getString(R.string.txt_decepticon)))
-                        transformer.setTeam("D");
-                    else
-                        Log.e("CreateEdit", "no class is matched selected team");
+                if (spnTeam.getSelectedItem().toString().equals(getResources().getString(R.string.txt_autobot)))
+                    transformer.setTeam("A");
+                else if (spnTeam.getSelectedItem().toString().equals(getResources().getString(R.string.txt_decepticon)))
+                    transformer.setTeam("D");
+                else
+                    Log.e("CreateEdit", "no class is matched selected team");
 
 
-                    SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(CreateActivity.this);
-                    String mToken = preferences.getString("Token", "");
+                SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(CreateActivity.this);
+                String mToken = preferences.getString("Token", "");
 
-                    OkHttpClient client = new OkHttpClient.Builder().addInterceptor(new Interceptor() {
-                        @Override
-                        public okhttp3.Response intercept(Chain chain) throws IOException {
-                            Request newRequest  = chain.request().newBuilder()
-                                    .addHeader(AppConstants.HEADER_AUTH, "Bearer " + mToken)
-                                    .addHeader(AppConstants.HEADER_CONTENT_TYPE,AppConstants.HEADER_CONTENT_TYPE_VALUE )
-                                    .build();
-                            return chain.proceed(newRequest);
-                        }
-                    }).build();
+                OkHttpClient client = new OkHttpClient.Builder().addInterceptor(new Interceptor() {
+                    @Override
+                    public okhttp3.Response intercept(Chain chain) throws IOException {
+                        Request newRequest  = chain.request().newBuilder()
+                                .addHeader(AppConstants.HEADER_AUTH, "Bearer " + mToken)
+                                .addHeader(AppConstants.HEADER_CONTENT_TYPE,AppConstants.HEADER_CONTENT_TYPE_VALUE )
+                                .build();
+                        return chain.proceed(newRequest);
+                    }
+                }).build();
 
 
-                    TransformerApi requestInterface = new Retrofit.Builder()
-                            .baseUrl(AppConstants.TRANSFORMER_URL)
-                            .client(client)
-                            .addConverterFactory(GsonConverterFactory.create())
-                            .build().create(TransformerApi.class);
+                TransformerApi requestInterface = new Retrofit.Builder()
+                        .baseUrl(AppConstants.TRANSFORMER_URL)
+                        .client(client)
+                        .addConverterFactory(GsonConverterFactory.create())
+                        .build().create(TransformerApi.class);
 
-                    requestInterface.createTransformers(transformer).enqueue(new Callback<TransformerRequest>() {
-                        @Override
-                        public void onResponse(Call<TransformerRequest> call, Response<TransformerRequest> response) {
-                            Log.e("TAG", "post submitted to API." + response.body().toString());
+                requestInterface.createTransformers(transformer).enqueue(new Callback<TransformerRequest>() {
+                    @Override
+                    public void onResponse(Call<TransformerRequest> call, Response<TransformerRequest> response) {
+                        Log.e("TAG", "post submitted to API." + response.body().toString());
 
-                        }
+                    }
 
-                        @Override
-                        public void onFailure(Call<TransformerRequest> call, Throwable t) {
-                            Log.e("TAG", "poserror." + t.getMessage());
-                        }
-                    });
+                    @Override
+                    public void onFailure(Call<TransformerRequest> call, Throwable t) {
+                        Log.e("TAG", "poserror." + t.getMessage());
+                    }
+                });
 
-                }
             }
-
-
         });
     }
 }

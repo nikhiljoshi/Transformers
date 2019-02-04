@@ -12,7 +12,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
@@ -24,7 +23,6 @@ import com.tels.assignment.model.Transformer;
 import com.tels.assignment.model.Transformers;
 import com.tels.assignment.presenter.BattleLogic;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import io.reactivex.disposables.CompositeDisposable;
@@ -94,39 +92,30 @@ public class MainActivity extends AppCompatActivity {
         Button btnReset = findViewById(R.id.btn_reset);
         Button btnBattle = findViewById(R.id.btn_battle);
 
-        btnCreate.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this,CreateActivity.class);
-                startActivity(intent);
-                finish();
-            }
+        btnCreate.setOnClickListener(v -> {
+            Intent intent = new Intent(MainActivity.this,CreateActivity.class);
+            startActivity(intent);
+            finish();
         });
 
-        btnReset.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-                SharedPreferences.Editor editor = preferences.edit();
-                editor.putString("Token","");
-                editor.apply();
-            }
+        btnReset.setOnClickListener(v -> {
+            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+            SharedPreferences.Editor editor = preferences.edit();
+            editor.putString("Token","");
+            editor.apply();
         });
 
-        btnBattle.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                int result = BattleLogic.startBattle(mTransformersArrayList);
+        btnBattle.setOnClickListener(v -> {
+            int result = BattleLogic.startBattle(mTransformersArrayList);
 
-                new AlertDialog.Builder(MainActivity.this)
-                        .setMessage(result)
-                        .setNeutralButton("OK", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                            }
-                        }).show();
+            new AlertDialog.Builder(MainActivity.this)
+                    .setMessage(result)
+                    .setNeutralButton("OK", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                        }
+                    }).show();
 
-            }
         });
 
 
