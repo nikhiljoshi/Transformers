@@ -22,10 +22,10 @@ import com.tels.assignment.connection.TransformerApi;
 import com.tels.assignment.model.Transformer;
 import com.tels.assignment.model.Transformers;
 import com.tels.assignment.presenter.BattleLogic;
+import com.tels.assignment.utility.AppConstants;
 
 import java.util.List;
 
-import io.reactivex.disposables.CompositeDisposable;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -39,7 +39,6 @@ public class MainActivity extends AppCompatActivity {
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private List<Transformer> mTransformersArrayList;
     private ActionBar mActionBar;
-    private CompositeDisposable mCompositeDisposable;
 
     private String mToken;
 
@@ -48,8 +47,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_vehicle_list);
-
-
         initView();
 
         final LinearLayoutManager layoutManager = new LinearLayoutManager(this);
@@ -64,11 +61,6 @@ public class MainActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
         });
-        mCompositeDisposable = new CompositeDisposable();
-
-
-
-
 
     }
 
@@ -93,7 +85,8 @@ public class MainActivity extends AppCompatActivity {
         Button btnBattle = findViewById(R.id.btn_battle);
 
         btnCreate.setOnClickListener(v -> {
-            Intent intent = new Intent(MainActivity.this,CreateActivity.class);
+            Intent intent = new Intent(MainActivity.this, CreateActivity.class);
+            intent.putExtra(AppConstants.CREATE_TYPE, AppConstants.CREATE_TYPE_CREATE);
             startActivity(intent);
             finish();
         });
@@ -130,10 +123,13 @@ public class MainActivity extends AppCompatActivity {
         call.enqueue(new Callback<Transformers>() {
             @Override
             public void onResponse(Call<Transformers> call, Response<Transformers> response) {
-                mTransformersArrayList = response.body().getTransformers();
-                TransformerDataAdapter adapter = new TransformerDataAdapter(response.body().getTransformers(), MainActivity.this);
-                mRecyclerView.setAdapter(adapter);
-                mSwipeRefreshLayout.setRefreshing(false);
+                if(response.body()!=null) {
+                    mTransformersArrayList = response.body().getTransformers();
+                    TransformerDataAdapter adapter = new TransformerDataAdapter(response.body().getTransformers(), MainActivity.this);
+                    mRecyclerView.setAdapter(adapter);
+                    mSwipeRefreshLayout.setRefreshing(false);
+                    adapter.notifyDataSetChanged();
+                }
             }
 
 
@@ -151,7 +147,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        mCompositeDisposable.clear();
     }
 
 

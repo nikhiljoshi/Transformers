@@ -1,47 +1,57 @@
 package com.tels.assignment.model;
 
+import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-import org.parceler.Parcel;
-
-@Parcel
-public class Transformer {
+public class UpdateTransformer {
 
     @SerializedName("id")
+    @Expose
     private String id;
-
     @SerializedName("name")
+    @Expose
     private String name;
-
+    @SerializedName("strength")
+    @Expose
+    private Integer strength;
+    @SerializedName("intelligence")
+    @Expose
+    private Integer intelligence;
+    @SerializedName("speed")
+    @Expose
+    private Integer speed;
+    @SerializedName("endurance")
+    @Expose
+    private Integer endurance;
+    @SerializedName("rank")
+    @Expose
+    private Integer rank;
+    @SerializedName("courage")
+    @Expose
+    private Integer courage;
+    @SerializedName("firepower")
+    @Expose
+    private Integer firepower;
+    @SerializedName("skill")
+    @Expose
+    private Integer skill;
     @SerializedName("team")
+    @Expose
     private String team;
 
-    @SerializedName("strength")
-    private Integer strength;
-
-    @SerializedName("intelligence")
-    private Integer intelligence;
-
-    @SerializedName("speed")
-    private Integer speed;
-
-    @SerializedName("endurance")
-    private Integer endurance;
-
-    @SerializedName("rank")
-    private Integer rank;
-
-    @SerializedName("courage")
-    private Integer courage;
-
-    @SerializedName("firepower")
-    private Integer firepower;
-
-    @SerializedName("skill")
-    private Integer skill;
-
-    @SerializedName("team_icon")
-    private String teamIcon;
+    public UpdateTransformer(Transformer mTransformer) {
+        this.setId(mTransformer.getId());
+        this.setName(mTransformer.getName());
+        this.setStrength(mTransformer.getStrength());
+        this.setIntelligence(mTransformer.getIntelligence());
+        this.setSpeed(mTransformer.getSpeed());
+        this.setEndurance(mTransformer.getEndurance());
+        this.setRank(mTransformer.getRank());
+        this.setCourage(mTransformer.getCourage());
+        this.setFirepower(mTransformer.getFirepower());
+        this.setSkill(mTransformer.getSkill());
+        this.setTeam(mTransformer.getTeam());
+    }
 
     public String getId() {
         return id;
@@ -57,14 +67,6 @@ public class Transformer {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public String getTeam() {
-        return team;
-    }
-
-    public void setTeam(String team) {
-        this.team = team;
     }
 
     public Integer getStrength() {
@@ -131,12 +133,12 @@ public class Transformer {
         this.skill = skill;
     }
 
-    public String getTeamIcon() {
-        return teamIcon;
+    public String getTeam() {
+        return team;
     }
 
-    public void setTeamIcon(String teamIcon) {
-        this.teamIcon = teamIcon;
+    public void setTeam(String team) {
+        this.team = team;
     }
 
 }

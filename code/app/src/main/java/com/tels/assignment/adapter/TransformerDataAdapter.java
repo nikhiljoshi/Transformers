@@ -6,16 +6,22 @@ package com.tels.assignment.adapter;
  */
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.tels.assignment.R;
 import com.tels.assignment.model.Transformer;
+import com.tels.assignment.ui.CreateActivity;
+import com.tels.assignment.utility.AppConstants;
+
+import org.parceler.Parcels;
 
 import java.util.List;
 
@@ -35,6 +41,7 @@ public class TransformerDataAdapter extends RecyclerView.Adapter<TransformerData
         public TextView txtCourage;
         public  TextView txtSkill;
         public  ImageView imgTeam;
+        public LinearLayout listItem;
 
         public ViewHolder(View view) {
             super(view);
@@ -44,6 +51,8 @@ public class TransformerDataAdapter extends RecyclerView.Adapter<TransformerData
             txtCourage = (TextView) view.findViewById(R.id.txt_courage);
             txtSkill = (TextView) view.findViewById(R.id.txt_skill);
             imgTeam = (ImageView) view.findViewById(R.id.img_team);
+            listItem = (LinearLayout) view.findViewById(R.id.item);
+
 
         }
     }
@@ -61,7 +70,7 @@ public class TransformerDataAdapter extends RecyclerView.Adapter<TransformerData
     public TransformerDataAdapter.ViewHolder onCreateViewHolder(ViewGroup parent,
                                                                 int viewType) {
         // create a new view
-        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.listview_transformer_stat, parent, false);
+        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_transformer_stat, parent, false);
         ViewHolder vh = new ViewHolder(v);
         return vh;
     }
@@ -81,6 +90,16 @@ public class TransformerDataAdapter extends RecyclerView.Adapter<TransformerData
         holder.txtCourage.setText(String.valueOf(mTransformerList.get(position).getCourage()));
 
         Glide.with(mContext).load(mTransformerList.get(position).getTeamIcon()).into(holder.imgTeam);
+
+        holder.listItem.setOnClickListener(v -> {
+            Intent intent = new Intent(mContext, CreateActivity.class);
+            intent.putExtra(AppConstants.CREATE_TYPE, AppConstants.CREATE_TYPE_EDIT);
+            intent.putExtra("Transformer", Parcels.wrap(mTransformerList.get(position)));
+            mContext.startActivity(intent);
+
+
+
+        });
 
     }
 

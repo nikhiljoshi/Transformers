@@ -2,9 +2,7 @@ package com.tels.assignment.ui;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.text.InputFilter;
 import android.util.Log;
@@ -14,28 +12,28 @@ import android.widget.EditText;
 import android.widget.Spinner;
 
 import com.tels.assignment.R;
+import com.tels.assignment.connection.RetrofitClient;
 import com.tels.assignment.connection.TransformerApi;
+import com.tels.assignment.model.Transformer;
 import com.tels.assignment.model.TransformerRequest;
+import com.tels.assignment.model.UpdateTransformer;
 import com.tels.assignment.utility.AppConstants;
 import com.tels.assignment.utility.InputFilterNumber;
 
-import java.io.IOException;
+import org.parceler.Parcels;
+
 import java.util.Random;
 
-import okhttp3.Interceptor;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 
 public class CreateActivity extends AppCompatActivity {
 
     private boolean isEdit = false;
     private String editID = null;
-
+    private Transformer mTransformer;
+    private  UpdateTransformer mUpdateTransformer;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -78,7 +76,32 @@ public class CreateActivity extends AppCompatActivity {
                 isEdit = false;
                 btnCreateEdit.setText(R.string.btn_create);
             }
+            else if (type.equals(AppConstants.CREATE_TYPE_EDIT)) {
+                isEdit = true;
+                btnCreateEdit.setText(R.string.btn_save);
+                mTransformer = (Transformer) Parcels.unwrap(getIntent().getParcelableExtra("Transformer"));
+                mUpdateTransformer = new UpdateTransformer(mTransformer);
 
+
+                if (mTransformer != null) {
+                    edtName.setText(mTransformer.getName());
+                    edtStrength.setText(mTransformer.getStrength() + "");
+                    edtIntelligence.setText(mTransformer.getIntelligence()  + "");
+                    edtEndurance.setText(mTransformer.getEndurance()  + "");
+                    edtCourage.setText(mTransformer.getCourage() + "");
+                    edtRank.setText(mTransformer.getRank() + "");
+                    edtSpeed.setText(mTransformer.getSpeed() + "");
+                    edtFirepower.setText(mTransformer.getFirepower() + "");
+                    edtSkill.setText(mTransformer.getSkill() + "");
+
+                    if (mTransformer.getTeam() == AppConstants.TR_ATTR_TEAM_AUTOBOT)
+                        spnTeam.setSelection(0);
+                    else if (mTransformer.getTeam() == AppConstants.TR_ATTR_TEAM_DECEPTICON)
+                        spnTeam.setSelection(1);
+                    else
+                        Log.w("CreateEdit","Edit: No team is matched for the Transformer");
+                }
+            }
         }
 
         btnCancel.setOnClickListener(v -> finish());
@@ -128,39 +151,37 @@ public class CreateActivity extends AppCompatActivity {
                     Log.e("CreateEdit", "no class is matched selected team");
 
 
-                SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(CreateActivity.this);
-                String mToken = preferences.getString("Token", "");
-
-                OkHttpClient client = new OkHttpClient.Builder().addInterceptor(new Interceptor() {
-                    @Override
-                    public okhttp3.Response intercept(Chain chain) throws IOException {
-                        Request newRequest  = chain.request().newBuilder()
-                                .addHeader(AppConstants.HEADER_AUTH, "Bearer " + mToken)
-                                .addHeader(AppConstants.HEADER_CONTENT_TYPE,AppConstants.HEADER_CONTENT_TYPE_VALUE )
-                                .build();
-                        return chain.proceed(newRequest);
-                    }
-                }).build();
+                TransformerApi requestInterface = RetrofitClient.getInstance(CreateActivity.this).create(TransformerApi.class);
 
 
-                TransformerApi requestInterface = new Retrofit.Builder()
-                        .baseUrl(AppConstants.TRANSFORMER_URL)
-                        .client(client)
-                        .addConverterFactory(GsonConverterFactory.create())
-                        .build().create(TransformerApi.class);
 
-                requestInterface.createTransformers(transformer).enqueue(new Callback<TransformerRequest>() {
-                    @Override
-                    public void onResponse(Call<TransformerRequest> call, Response<TransformerRequest> response) {
-                        Log.e("TAG", "post submitted to API." + response.body().toString());
+                if (isEdit) {
+                    requestInterface.updateTransformers(mUpdateTransformer).enqueue(new Callback<UpdateTransformer>() {
+                        @Override
+                        public void onResponse(Call<UpdateTransformer> call, Response<UpdateTransformer> response) {
+                            Log.e("TAG", "post submitted to API." + response.body().toString());
+                        }
 
-                    }
+                        @Override
+                        public void onFailure(Call<UpdateTransformer> call, Throwable t) {
 
-                    @Override
-                    public void onFailure(Call<TransformerRequest> call, Throwable t) {
-                        Log.e("TAG", "poserror." + t.getMessage());
-                    }
-                });
+                        }
+                    });
+                }else
+                {
+                    requestInterface.createTransformers(transformer).enqueue(new Callback<TransformerRequest>() {
+                        @Override
+                        public void onResponse(Call<TransformerRequest> call, Response<TransformerRequest> response) {
+                            Log.e("TAG", "post submitted to API." + response.body().toString());
+
+                        }
+
+                        @Override
+                        public void onFailure(Call<TransformerRequest> call, Throwable t) {
+                            Log.e("TAG", "poserror." + t.getMessage());
+                        }
+                    });
+                }
 
             }
         });
