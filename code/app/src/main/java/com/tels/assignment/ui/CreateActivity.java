@@ -24,6 +24,9 @@ import org.parceler.Parcels;
 
 import java.util.Random;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -34,26 +37,49 @@ public class CreateActivity extends AppCompatActivity {
     private String editID = null;
     private Transformer mTransformer;
     private  UpdateTransformer mUpdateTransformer;
+
+    @BindView(R.id.btn_cancel)
+    Button btnCancel;
+
+    @BindView(R.id.edt_strength)
+    EditText edtStrength;
+    @BindView(R.id.edt_intelligence)
+    EditText edtIntelligence;
+    @BindView(R.id.edt_speed)
+    EditText edtSpeed ;
+    @BindView(R.id.edt_endurance)
+    EditText edtEndurance ;
+    @BindView(R.id.edt_rank)
+    EditText edtRank;
+    @BindView(R.id.edt_courage)
+    EditText edtCourage ;
+    @BindView(R.id.edt_firepower)
+    EditText edtFirepower ;
+    @BindView(R.id.edt_skill)
+    EditText edtSkill;
+    @BindView(R.id.edt_name)
+    EditText edtName ;
+    @BindView(R.id.spn_team)
+    Spinner spnTeam ;
+    @BindView(R.id.btn_create_or_edit)
+    Button btnCreateEdit;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create);
+        ButterKnife.bind(this);
+        setFilters();
+        getBundleData();
 
-        Button btnCreateEdit = findViewById(R.id.btn_create_or_edit);
-        Button btnAuto = findViewById(R.id.btn_auto);
-        Button btnCancel = findViewById(R.id.btn_cancel);
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.team_array, android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spnTeam.setAdapter(adapter);
 
-        final EditText edtStrength = findViewById(R.id.edt_strength);
-        final EditText edtIntelligence = findViewById(R.id.edt_intelligence);
-        final EditText edtSpeed = findViewById(R.id.edt_speed);
-        final EditText edtEndurance = findViewById(R.id.edt_endurance);
-        final EditText edtRank = findViewById(R.id.edt_rank);
-        final EditText edtCourage = findViewById(R.id.edt_courage);
-        final EditText edtFirepower = findViewById(R.id.edt_firepower);
-        final EditText edtSkill = findViewById(R.id.edt_skill);
-        final EditText edtName = findViewById(R.id.edt_name);
-        final Spinner spnTeam = findViewById(R.id.spn_team);
+    }
 
+    private void setFilters()
+    {
         InputFilter[] inputFilters = new InputFilter[] { new InputFilterNumber(1, 10) };
         edtStrength.setFilters(inputFilters);
         edtIntelligence.setFilters(inputFilters);
@@ -63,11 +89,10 @@ public class CreateActivity extends AppCompatActivity {
         edtCourage.setFilters(inputFilters);
         edtFirepower.setFilters(inputFilters);
         edtSkill.setFilters(inputFilters);
+    }
 
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.team_array, android.R.layout.simple_spinner_item);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spnTeam.setAdapter(adapter);
-
+    private void getBundleData()
+    {
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
             String type = extras.getString(AppConstants.CREATE_TYPE);
@@ -103,87 +128,88 @@ public class CreateActivity extends AppCompatActivity {
                 }
             }
         }
+    }
 
-        btnCancel.setOnClickListener(v -> finish());
+    @OnClick(R.id.btn_auto)
+    public void autoFillClicked() {
+        Random random = new Random();
 
-        btnAuto.setOnClickListener(v -> {
-            Random random = new Random();
+        edtStrength.setText((random.nextInt(10) + 1) + "");
+        edtIntelligence.setText((random.nextInt(10) + 1) + "");
+        edtSpeed.setText((random.nextInt(10) + 1) + "");
+        edtEndurance.setText((random.nextInt(10) + 1) + "");
+        edtRank.setText((random.nextInt(10) + 1) + "");
+        edtCourage.setText((random.nextInt(10) + 1) + "");
+        edtFirepower.setText((random.nextInt(10) + 1) + "");
+        edtSkill.setText((random.nextInt(10) + 1) + "");
+    }
 
-            edtStrength.setText((random.nextInt(10) + 1) + "");
-            edtIntelligence.setText((random.nextInt(10) + 1) + "");
-            edtSpeed.setText((random.nextInt(10) + 1) + "");
-            edtEndurance.setText((random.nextInt(10) + 1) + "");
-            edtRank.setText((random.nextInt(10) + 1) + "");
-            edtCourage.setText((random.nextInt(10) + 1) + "");
-            edtFirepower.setText((random.nextInt(10) + 1) + "");
-            edtSkill.setText((random.nextInt(10) + 1) + "");
-        });
+    @OnClick(R.id.btn_create_or_edit)
+    public void createEditClicked()
+    {
+        TransformerRequest transformer = new TransformerRequest();
 
-        btnCreateEdit.setOnClickListener(v -> {
-            TransformerRequest transformer = new TransformerRequest();
+        if (edtCourage.getText().toString().equals("") || edtEndurance.getText().toString().equals("") || edtFirepower.getText().toString().equals("")
+                || edtIntelligence.getText().toString().equals("") || edtRank.getText().toString().equals("") || edtSkill.getText().toString().equals("")
+                || edtSpeed.getText().toString().equals("") || edtStrength.getText().toString().equals("")) {
+            new AlertDialog.Builder(CreateActivity.this)
+                    .setMessage(R.string.msg_fail_create_invalid_data)
+                    .setNeutralButton(R.string.msg_btn_ok, new DialogInterface.OnClickListener(){
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {}
+                    }).show();
+        }
+        else {
+            transformer.setName(edtName.getText().toString());
+            transformer.setStrength(Integer.parseInt(edtStrength.getText().toString()));
+            transformer.setIntelligence(Integer.parseInt(edtIntelligence.getText().toString()));
+            transformer.setSpeed(Integer.parseInt(edtSpeed.getText().toString()));
+            transformer.setEndurance(Integer.parseInt(edtEndurance.getText().toString()));
+            transformer.setCourage(Integer.parseInt(edtCourage.getText().toString()));
+            transformer.setRank(Integer.parseInt(edtRank.getText().toString()));
+            transformer.setFirepower(Integer.parseInt(edtFirepower.getText().toString()));
+            transformer.setSkill(Integer.parseInt(edtSkill.getText().toString()));
 
-            if (edtCourage.getText().toString().equals("") || edtEndurance.getText().toString().equals("") || edtFirepower.getText().toString().equals("")
-                    || edtIntelligence.getText().toString().equals("") || edtRank.getText().toString().equals("") || edtSkill.getText().toString().equals("")
-                    || edtSpeed.getText().toString().equals("") || edtStrength.getText().toString().equals("")) {
-                new AlertDialog.Builder(CreateActivity.this)
-                        .setMessage(R.string.msg_fail_create_invalid_data)
-                        .setNeutralButton(R.string.msg_btn_ok, new DialogInterface.OnClickListener(){
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {}
-                        }).show();
+            if (spnTeam.getSelectedItem().toString().equals(getResources().getString(R.string.txt_autobot)))
+                transformer.setTeam("A");
+            else if (spnTeam.getSelectedItem().toString().equals(getResources().getString(R.string.txt_decepticon)))
+                transformer.setTeam("D");
+            else
+                Log.e("CreateEdit", "no class is matched selected team");
+
+
+            TransformerApi requestInterface = RetrofitClient.getInstance(CreateActivity.this).create(TransformerApi.class);
+
+
+
+            if (isEdit) {
+                requestInterface.updateTransformers(mUpdateTransformer).enqueue(new Callback<UpdateTransformer>() {
+                    @Override
+                    public void onResponse(Call<UpdateTransformer> call, Response<UpdateTransformer> response) {
+                        Log.e("TAG", "post submitted to API." + response.body().toString());
+                    }
+
+                    @Override
+                    public void onFailure(Call<UpdateTransformer> call, Throwable t) {
+
+                    }
+                });
+            }else
+            {
+                requestInterface.createTransformers(transformer).enqueue(new Callback<TransformerRequest>() {
+                    @Override
+                    public void onResponse(Call<TransformerRequest> call, Response<TransformerRequest> response) {
+                        Log.e("TAG", "post submitted to API." + response.body().toString());
+
+                    }
+
+                    @Override
+                    public void onFailure(Call<TransformerRequest> call, Throwable t) {
+                        Log.e("TAG", "poserror." + t.getMessage());
+                    }
+                });
             }
-            else {
-                transformer.setName(edtName.getText().toString());
-                transformer.setStrength(Integer.parseInt(edtStrength.getText().toString()));
-                transformer.setIntelligence(Integer.parseInt(edtIntelligence.getText().toString()));
-                transformer.setSpeed(Integer.parseInt(edtSpeed.getText().toString()));
-                transformer.setEndurance(Integer.parseInt(edtEndurance.getText().toString()));
-                transformer.setCourage(Integer.parseInt(edtCourage.getText().toString()));
-                transformer.setRank(Integer.parseInt(edtRank.getText().toString()));
-                transformer.setFirepower(Integer.parseInt(edtFirepower.getText().toString()));
-                transformer.setSkill(Integer.parseInt(edtSkill.getText().toString()));
 
-                if (spnTeam.getSelectedItem().toString().equals(getResources().getString(R.string.txt_autobot)))
-                    transformer.setTeam("A");
-                else if (spnTeam.getSelectedItem().toString().equals(getResources().getString(R.string.txt_decepticon)))
-                    transformer.setTeam("D");
-                else
-                    Log.e("CreateEdit", "no class is matched selected team");
-
-
-                TransformerApi requestInterface = RetrofitClient.getInstance(CreateActivity.this).create(TransformerApi.class);
-
-
-
-                if (isEdit) {
-                    requestInterface.updateTransformers(mUpdateTransformer).enqueue(new Callback<UpdateTransformer>() {
-                        @Override
-                        public void onResponse(Call<UpdateTransformer> call, Response<UpdateTransformer> response) {
-                            Log.e("TAG", "post submitted to API." + response.body().toString());
-                        }
-
-                        @Override
-                        public void onFailure(Call<UpdateTransformer> call, Throwable t) {
-
-                        }
-                    });
-                }else
-                {
-                    requestInterface.createTransformers(transformer).enqueue(new Callback<TransformerRequest>() {
-                        @Override
-                        public void onResponse(Call<TransformerRequest> call, Response<TransformerRequest> response) {
-                            Log.e("TAG", "post submitted to API." + response.body().toString());
-
-                        }
-
-                        @Override
-                        public void onFailure(Call<TransformerRequest> call, Throwable t) {
-                            Log.e("TAG", "poserror." + t.getMessage());
-                        }
-                    });
-                }
-
-            }
-        });
+        }
     }
 }
