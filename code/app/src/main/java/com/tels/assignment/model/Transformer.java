@@ -8,52 +8,40 @@ import org.parceler.Parcel;
 public class Transformer {
 
     @SerializedName("id")
-
-     String id;
+    String id;
 
     @SerializedName("name")
-
-     String name;
+    String name;
 
     @SerializedName("team")
-
-     String team;
+    String team;
 
     @SerializedName("strength")
-
-     Integer strength;
+    Integer strength;
 
     @SerializedName("intelligence")
-
-     Integer intelligence;
+    Integer intelligence;
 
     @SerializedName("speed")
-
-     Integer speed;
+    Integer speed;
 
     @SerializedName("endurance")
-
-     Integer endurance;
+    Integer endurance;
 
     @SerializedName("rank")
-
-     Integer rank;
+    Integer rank;
 
     @SerializedName("courage")
-
-     Integer courage;
+    Integer courage;
 
     @SerializedName("firepower")
-
-     Integer firepower;
+    Integer firepower;
 
     @SerializedName("skill")
-
-     Integer skill;
+    Integer skill;
 
     @SerializedName("team_icon")
-
-     String teamIcon;
+    String teamIcon;
 
     public String getId() {
         return id;
